@@ -1,8 +1,34 @@
-# React + Vite
+# Online Shopping Cart
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+這是一個模擬的線上購物車應用程式，允許使用者瀏覽商品、選擇尺寸和顏色、加入購物車，並完成訂單。
 
-Currently, two official plugins are available:
+## 專案預覽
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+![展示頁面(大)](</src/assets/E-shop商品展示頁面(大).png>)
+![展示頁面(小)](</src/assets/E-shop商品展示頁面(小).png>)
+![展示頁面(小)](/src/assets/E-shop商品資訊頁面.png)
+![展示頁面(小)](/src/assets/E-shop購物車頁面.png)
+
+## 功能列表
+
+- 瀏覽商品列表
+- 按分類篩選商品
+- 查看商品詳情（選擇尺寸和顏色）
+- 添加商品到購物車
+- 查看和編輯購物車
+- 結帳流程（模擬）
+
+## 部署網址
+
+- Live Site URL: [前往佈署網址](https://eshop-deploy-one.vercel.app/)
+
+## 技術棧
+
+- 前端框架: React
+- UI 框架: Material-UI
+- 狀態管理: React Context API
+- 路由: React Router
+
+## Author
+
+Github - [Ming Hsu](https://github.com/GHSergio)
