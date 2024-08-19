@@ -4,10 +4,16 @@
 
 ## 專案預覽
 
-<img src="/src/assets/E-shop商品展示頁面(大).png" alt="展示頁面(大)" width="300"/>
-<img src="/src/assets/E-shop商品展示頁面(小).png" alt="展示頁面(小)" width="300"/>
-<img src="/src/assets/E-shop商品資訊頁面.png" alt="商品資訊頁面" width="300"/>
-<img src="/src/assets/E-shop購物車頁面.png" alt="購物車頁面" width="300"/>
+<table>
+  <tr>
+    <td><img src="/src/assets/E-shop商品展示頁面(大).png" alt="展示頁面(大)" width="300"/></td>
+    <td><img src="/src/assets/E-shop商品展示頁面(小).png" alt="展示頁面(小)" width="300"/></td>
+  </tr>
+  <tr>
+    <td><img src="/src/assets/E-shop商品資訊頁面.png" alt="商品資訊頁面" width="300"/></td>
+    <td><img src="/src/assets/E-shop購物車頁面.png" alt="購物車頁面" width="300"/></td>
+  </tr>
+</table>
 
 ## 功能列表
 
