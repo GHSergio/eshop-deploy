@@ -11,19 +11,32 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import NavLinks from "./NavLinks";
 import CartDropdown from "./CartDropdown";
-// import SearchBar from "./SearchBar";
-import { useProductContext } from "../contexts/ProductContext";
 import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../store/index";
+import {
+  selectCartItemCount,
+  openCart,
+  closeCart,
+} from "../slice/productSlice";
+// import SearchBar from "./SearchBar";
 
 const NavBar: React.FC = () => {
-  const {
-    categories,
-    cartItemCount,
-    showCart,
-    handleMouseEnter,
-    handleMouseLeave,
-  } = useProductContext();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { categories, showCart } = useSelector(
+    (state: RootState) => state.products
+  );
+  const cartItemCount = useSelector((state: RootState) =>
+    selectCartItemCount(state)
+  );
+
+  const handleMouseEnter = () => {
+    dispatch(openCart());
+  };
+  const handleMouseLeave = () => {
+    dispatch(closeCart());
+  };
 
   return (
     <AppBar position="sticky">

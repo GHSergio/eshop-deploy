@@ -1,9 +1,10 @@
 import React from "react";
 import { Box, Typography, Divider, Tooltip, Grid } from "@mui/material";
-import { useProductContext } from "../contexts/ProductContext";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/index";
 
 const CartDropdown: React.FC = () => {
-  const { cart } = useProductContext();
+  const { cart } = useSelector((state: RootState) => state.products);
 
   const headerStyle = {
     fontWeight: "bold",

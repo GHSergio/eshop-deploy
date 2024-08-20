@@ -12,7 +12,12 @@ import {
   Tooltip,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { useProductContext } from "../../contexts/ProductContext";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../../store/index";
+import {
+  removeFromCart,
+  updateCartItemQuantity,
+} from "../../slice/productSlice";
 
 interface SelectedItem {
   id: string;
@@ -35,7 +40,8 @@ const CartSummary: React.FC<CartSummaryProps> = ({
   setSelectedItems,
   onValidChange,
 }) => {
-  const { cart, removeFromCart, updateCartItemQuantity } = useProductContext();
+  const dispatch = useDispatch();
+  const { cart } = useSelector((state: RootState) => state.products);
 
   useEffect(() => {
     // 當selectedItems改變時，更新是否可以進行下一步的狀態
@@ -92,7 +98,9 @@ const CartSummary: React.FC<CartSummaryProps> = ({
     newQuantity: number
   ) => {
     if (newQuantity > 0) {
-      updateCartItemQuantity(id, color, size, newQuantity);
+      dispatch(
+        updateCartItemQuantity({ id, color, size, quantity: newQuantity })
+      );
     }
   };
 
@@ -290,7 +298,15 @@ const CartSummary: React.FC<CartSummaryProps> = ({
               </Grid>
 
               <IconButton
-                onClick={() => removeFromCart(item.id, item.color, item.size)}
+                onClick={() =>
+                  dispatch(
+                    removeFromCart({
+                      id: item.id,
+                      color: item.color,
+                      size: item.size,
+                    })
+                  )
+                }
                 sx={{
                   position: "absolute",
                   top: 0,

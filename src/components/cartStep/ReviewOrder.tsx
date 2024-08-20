@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, Typography, Divider, Card, CardMedia, Grid } from "@mui/material";
-import { useProductContext } from "../../contexts/ProductContext";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/index";
 
 interface ReviewOrderProps {
   shippingInfo: any;
@@ -11,7 +12,7 @@ const ReviewOrder: React.FC<ReviewOrderProps> = ({
   shippingInfo,
   paymentInfo,
 }) => {
-  const { cart } = useProductContext();
+  const { cart } = useSelector((state: RootState) => state.products);
 
   const calculateTotal = () => {
     return cart.reduce(

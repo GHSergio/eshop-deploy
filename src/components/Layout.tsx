@@ -9,18 +9,31 @@ import NavBar from "./NavBar";
 import Footer from "./Footer";
 import NavLinks from "./NavLinks";
 import CartDropdown from "./CartDropdown";
-import { useProductContext } from "../contexts/ProductContext";
 import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../store/index";
+import {
+  openCart,
+  closeCart,
+  selectCartItemCount,
+} from "../slice/productSlice";
 
 const Layout: React.FC = () => {
-  const {
-    categories, //目前是API提供的分類
-    cartItemCount,
-    showCart,
-    handleMouseEnter,
-    handleMouseLeave,
-  } = useProductContext();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  // useSelector 用來從 Redux store 中提取狀態
+  const { categories, showCart } = useSelector(
+    (state: RootState) => state.products
+  );
+  const cartItemCount = useSelector((state: RootState) =>
+    selectCartItemCount(state)
+  );
+  const handleMouseEnter = () => {
+    dispatch(openCart());
+  };
+  const handleMouseLeave = () => {
+    dispatch(closeCart());
+  };
 
   // 定義 Icon 樣式
   const iconStyle = (size: string = "1.2rem") => ({

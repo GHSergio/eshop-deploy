@@ -3,21 +3,34 @@ import { Grid, Typography, Box } from "@mui/material";
 import SearchBar from "./SearchBar";
 import ProductCard from "./ProductCard";
 // import Sidebar from "./SideBar";
-import { useProductContext } from "../contexts/ProductContext";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "../store/index";
+import {
+  setSearchQuery,
+  fetchProductsAndCategories,
+} from "../slice/productSlice";
 
 interface MainContentProps {
   category?: string;
 }
 
 const MainContent: React.FC<MainContentProps> = ({ category }) => {
-  // 使用 useProductContext 獲取 context 中的數據
-  const { products, searchQuery, loading, error, setSearchQuery } =
-    useProductContext();
+  // 明確指定 dispatch 的類型
+  const dispatch: AppDispatch = useDispatch();
+  // useSelector 用來從 Redux store 中提取狀態
+  const { products, searchQuery, loading, error } = useSelector(
+    (state: RootState) => state.products
+  );
+
+  // 當組件掛載時，調用 fetchProductsAndCategories Thunk 獲取商品和分類數據
+  useEffect(() => {
+    dispatch(fetchProductsAndCategories());
+  }, [dispatch]);
 
   // 當 category 改變時，清空搜尋字串
   useEffect(() => {
-    setSearchQuery("");
-  }, [category, setSearchQuery]);
+    dispatch(setSearchQuery(""));
+  }, [category, dispatch]);
 
   // 根據 category 和 searchQuery 進行過濾
   const filteredProducts = products.filter((product) => {

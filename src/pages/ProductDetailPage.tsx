@@ -11,8 +11,9 @@ import {
   FormControl,
   InputLabel,
 } from "@mui/material";
-import { useProductContext } from "../contexts/ProductContext";
 import { Product, fetchProductById } from "../api/FakeStoreAPI";
+import { useDispatch } from "react-redux";
+import { addToCart } from "../slice/productSlice";
 
 const ProductDetail: React.FC = () => {
   //從網址動態參數獲取id
@@ -24,7 +25,7 @@ const ProductDetail: React.FC = () => {
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
 
-  const { addToCart } = useProductContext();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -57,16 +58,18 @@ const ProductDetail: React.FC = () => {
     if (product) {
       // 生成唯一的 ID，基於原始 ID、顏色和尺寸
       const uniqueId = `${product.id}-${selectedColor}-${selectedSize}`;
-      addToCart({
-        id: uniqueId,
-        // id: product.id,
-        title: product.title,
-        price: product.price,
-        quantity,
-        image: product.image,
-        color: selectedColor,
-        size: selectedSize,
-      });
+      dispatch(
+        addToCart({
+          id: uniqueId,
+          // id: product.id,
+          title: product.title,
+          price: product.price,
+          quantity,
+          image: product.image,
+          color: selectedColor,
+          size: selectedSize,
+        })
+      );
     }
   };
 

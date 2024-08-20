@@ -8,12 +8,14 @@ import {
   Typography,
 } from "@mui/material";
 import { Link } from "react-router-dom";
-import { useProductContext } from "../contexts/ProductContext";
 import CartSummary from "../components/cartStep/CartSummary";
 import ShippingInformation from "../components/cartStep/ShippingInformation";
 import PaymentDetails from "../components/cartStep/PaymentDetails";
 import ReviewOrder from "../components/cartStep/ReviewOrder";
-
+// import { useProductContext } from "../contexts/ProductContext";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../store";
+import { clearCart } from "../slice/productSlice";
 const steps = ["確認購物車", "運送資訊", "付費方式", "確認訂單"];
 
 interface SelectedItem {
@@ -33,8 +35,8 @@ const CartPage: React.FC = () => {
   const [isShippingValid, setIsShippingValid] = useState(false);
   const [isPaymentValid, setIsPaymentValid] = useState(false);
 
-  console.log(selectedItems);
-  const { clearCart } = useProductContext();
+  // 使用 useDispatch 來發送 action
+  const dispatch = useDispatch();
 
   // 驗證表單是否填寫　才能進入Next Step
   const handleNext = () => {
@@ -103,7 +105,7 @@ const CartPage: React.FC = () => {
               to="/"
               variant="contained"
               color="primary"
-              onClick={clearCart}
+              onClick={() => dispatch(clearCart())} // 使用 dispatch 來清空購物車
             >
               返回主頁面
             </Button>

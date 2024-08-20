@@ -65,11 +65,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <Typography variant="body2" color="text.secondary">
           {discountPrice ? (
             <>
-              <span style={{ textDecoration: "line-through" }}>{price}</span>{" "}
-              <span>{discountPrice}</span>
+              <span style={{ textDecoration: "line-through" }}> ${price}</span>{" "}
+              <span>${discountPrice}</span>
             </>
           ) : (
-            price
+            `$ ${price}`
           )}
         </Typography>
       </CardContent>
