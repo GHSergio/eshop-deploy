@@ -32,7 +32,7 @@
 
 - 前端框架: React
 - UI 框架: Material-UI
-- 狀態管理: React Context API
+- 狀態管理: React Context API & Redux Toolkit
 - 路由: React Router
 
 ## Author
