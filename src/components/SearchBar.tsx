@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { TextField, InputAdornment } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../store/index";
 import { setSearchQuery } from "../slice/productSlice";
+import debounce from "lodash/debounce";
 
 interface SearchBarProps {
   height?: string | number;
@@ -12,17 +13,32 @@ interface SearchBarProps {
 
 const SearchBar: React.FC<SearchBarProps> = ({ height, width }) => {
   const dispatch = useDispatch();
-  const { searchQuery } = useSelector((state: RootState) => state.products);
+  const searchQuery = useSelector(
+    (state: RootState) => state.products.searchQuery
+  );
 
-  const handleClearSearch = () => {
+  const handleClearSearch = useCallback(() => {
     dispatch(setSearchQuery(""));
+  }, [dispatch]);
+
+  // 使用lodash的debounce來延遲搜尋操作
+  const debounceSearch = useCallback(
+    debounce((query: string) => {
+      dispatch(setSearchQuery(query));
+    }, 100),
+    [dispatch]
+  );
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    debounceSearch(e.target.value);
   };
+
   return (
     <TextField
       placeholder="Search"
       variant="outlined"
       value={searchQuery}
-      onChange={(e) => dispatch(setSearchQuery?.(e.target.value))}
+      onChange={handleChange}
       fullWidth
       InputProps={{
         endAdornment: (

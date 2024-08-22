@@ -1,6 +1,5 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-// import { useProductContext } from "../contexts/ProductContext";
 import { Grid, Typography } from "@mui/material";
 import MainContent from "../components/MainContent";
 

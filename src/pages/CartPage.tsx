@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Box,
   Button,
@@ -14,6 +14,7 @@ import PaymentDetails from "../components/cartStep/PaymentDetails";
 import ReviewOrder from "../components/cartStep/ReviewOrder";
 import { useDispatch } from "react-redux";
 import { clearCart } from "../slice/productSlice";
+import { useNavigate } from "react-router-dom";
 
 const steps = ["確認購物車", "運送資訊", "付費方式", "確認訂單"];
 
@@ -64,6 +65,7 @@ const CartPage: React.FC = () => {
   // console.log("支付方式:", paymentInfo);
 
   // 使用 useDispatch 來發送 action
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   // 處理 Shipping 的表單驗證
@@ -189,6 +191,20 @@ const CartPage: React.FC = () => {
             >
               返回主頁面
             </Button>
+            <Typography
+              variant="h6"
+              gutterBottom
+              sx={{ fontSize: "0.9rem", marginTop: "0.5rem" }}
+            >
+              將在兩秒後自動返回主頁面
+            </Typography>
+            <Typography
+              variant="h6"
+              gutterBottom
+              sx={{ fontSize: "0.9rem", marginTop: "0.5rem" }}
+            >
+              也可以立即按下返回主頁面
+            </Typography>
           </Box>
         );
     }
@@ -198,6 +214,18 @@ const CartPage: React.FC = () => {
     () => renderStepContent(activeStep),
     [activeStep, selectedItems, shippingInfo, paymentInfo, errors, submitted]
   );
+
+  // 完成訂單流程 2秒後清空購物車  & 回到主頁面
+  useEffect(() => {
+    if (activeStep === steps.length) {
+      handleClearCart();
+      const timer = setTimeout(() => {
+        navigate("/");
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [activeStep, handleClearCart, navigate]);
 
   return (
     <Box

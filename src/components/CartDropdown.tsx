@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Box, Typography, Divider, Tooltip, Grid } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/index";
@@ -20,6 +20,36 @@ const CartDropdown: React.FC = () => {
     color: "black",
     textAlign: "center",
   };
+
+  // 使用 useMemo 來優化 cart.items 的生成
+  const renderedItems = useMemo(() => {
+    return cart.map((item, index) => (
+      <Grid container spacing={0.5} key={index} sx={{ mb: 1 }}>
+        <Grid item xs={6}>
+          <Tooltip title={item.title} arrow>
+            <Typography variant="body2" sx={cellStyle}>
+              {item.title}
+            </Typography>
+          </Tooltip>
+        </Grid>
+        <Grid item xs={2}>
+          <Typography variant="body2" sx={cellStyle}>
+            {item.color || "N/A"}
+          </Typography>
+        </Grid>
+        <Grid item xs={2}>
+          <Typography variant="body2" sx={cellStyle}>
+            {item.size || "N/A"}
+          </Typography>
+        </Grid>
+        <Grid item xs={2}>
+          <Typography variant="body2" sx={cellStyle}>
+            {item.quantity}
+          </Typography>
+        </Grid>
+      </Grid>
+    ));
+  }, [cart]);
 
   return (
     <Box
@@ -56,7 +86,7 @@ const CartDropdown: React.FC = () => {
       <Divider sx={{ my: 1 }} />
 
       {/* Items */}
-      {cart.map((item, index) => (
+      {/* {cart.map((item, index) => (
         <Grid container spacing={0.5} key={index} sx={{ mb: 1 }}>
           <Grid item xs={6}>
             <Tooltip title={item.title} arrow>
@@ -81,7 +111,8 @@ const CartDropdown: React.FC = () => {
             </Typography>
           </Grid>
         </Grid>
-      ))}
+      ))} */}
+      {renderedItems}
     </Box>
   );
 };

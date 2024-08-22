@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import {
   AppBar,
   Toolbar,
@@ -24,19 +24,21 @@ import {
 const NavBar: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { categories, showCart } = useSelector(
-    (state: RootState) => state.products
-  );
-  const cartItemCount = useSelector((state: RootState) =>
-    selectCartItemCount(state)
-  );
 
-  const handleMouseEnter = () => {
+  const categories = useSelector(
+    (state: RootState) => state.products.categories
+  );
+  const showCart = useSelector((state: RootState) => state.products.showCart);
+
+  const cartItemCount = useSelector(selectCartItemCount);
+
+  const handleMouseEnter = useCallback(() => {
     dispatch(openCart());
-  };
-  const handleMouseLeave = () => {
+  }, [dispatch]);
+
+  const handleMouseLeave = useCallback(() => {
     dispatch(closeCart());
-  };
+  }, [dispatch]);
 
   return (
     <AppBar position="sticky">

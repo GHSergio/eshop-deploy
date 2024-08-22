@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import {
   Card,
   CardContent,
@@ -26,10 +26,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
   discountPrice,
 }) => {
   const navigate = useNavigate();
+
   // onClick image就會前往該商品細節頁面
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     navigate(`/products/${id}`);
-  };
+  }, [navigate, id]);
 
   return (
     <Card

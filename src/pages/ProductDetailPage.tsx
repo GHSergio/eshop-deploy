@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import {
   Box,
@@ -10,6 +10,7 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  SelectChangeEvent,
 } from "@mui/material";
 import { Product, fetchProductById } from "../api/FakeStoreAPI";
 import { useDispatch } from "react-redux";
@@ -54,7 +55,7 @@ const ProductDetail: React.FC = () => {
     loadProduct();
   }, [id]);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = useCallback(() => {
     if (product) {
       // 生成唯一的 ID，基於原始 ID、顏色和尺寸
       const uniqueId = `${product.id}-${selectedColor}-${selectedSize}`;
@@ -71,7 +72,19 @@ const ProductDetail: React.FC = () => {
         })
       );
     }
-  };
+  }, [product, quantity, selectedColor, selectedSize, dispatch]);
+
+  const handleColorChange = useCallback((e: SelectChangeEvent<string>) => {
+    setSelectedColor(e.target.value as string);
+  }, []);
+
+  const handleSizeChange = useCallback((e: SelectChangeEvent<string>) => {
+    setSelectedSize(e.target.value as string);
+  }, []);
+
+  const handleQuantityChange = useCallback((e: SelectChangeEvent<number>) => {
+    setQuantity(e.target.value as number);
+  }, []);
 
   if (loading) {
     return (
@@ -172,7 +185,7 @@ const ProductDetail: React.FC = () => {
               <InputLabel>Color</InputLabel>
               <Select
                 value={selectedColor}
-                onChange={(e) => setSelectedColor(e.target.value as string)}
+                onChange={handleColorChange}
                 label="Color"
               >
                 <MenuItem value="Red">Red</MenuItem>
@@ -185,7 +198,7 @@ const ProductDetail: React.FC = () => {
               <InputLabel>Size</InputLabel>
               <Select
                 value={selectedSize}
-                onChange={(e) => setSelectedSize(e.target.value as string)}
+                onChange={handleSizeChange}
                 label="Size"
               >
                 <MenuItem value="S">Small</MenuItem>
@@ -206,7 +219,7 @@ const ProductDetail: React.FC = () => {
               <InputLabel>Quantity</InputLabel>
               <Select
                 value={quantity}
-                onChange={(e) => setQuantity(e.target.value as number)}
+                onChange={handleQuantityChange}
                 label="Quantity"
               >
                 {[1, 2, 3, 4, 5].map((num) => (

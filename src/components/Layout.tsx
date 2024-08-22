@@ -1,5 +1,5 @@
 // Layout.tsx
-import React from "react";
+import React, { useCallback } from "react";
 import { Outlet } from "react-router-dom";
 import { Box, IconButton, Typography, Badge } from "@mui/material";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
@@ -22,18 +22,20 @@ const Layout: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   // useSelector 用來從 Redux store 中提取狀態
-  const { categories, showCart } = useSelector(
-    (state: RootState) => state.products
+  const categories = useSelector(
+    (state: RootState) => state.products.categories
   );
-  const cartItemCount = useSelector((state: RootState) =>
-    selectCartItemCount(state)
-  );
-  const handleMouseEnter = () => {
+  const showCart = useSelector((state: RootState) => state.products.showCart);
+
+  const cartItemCount = useSelector(selectCartItemCount);
+
+  const handleMouseEnter = useCallback(() => {
     dispatch(openCart());
-  };
-  const handleMouseLeave = () => {
+  }, [dispatch]);
+
+  const handleMouseLeave = useCallback(() => {
     dispatch(closeCart());
-  };
+  }, [dispatch]);
 
   // 定義 Icon 樣式
   const iconStyle = (size: string = "1.2rem") => ({
