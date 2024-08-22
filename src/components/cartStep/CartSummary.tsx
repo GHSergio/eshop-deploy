@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -30,7 +30,6 @@ interface CartSummaryProps {
   setSelectAll: (value: boolean) => void;
   selectedItems: SelectedItem[];
   setSelectedItems: (items: SelectedItem[]) => void;
-  onValidChange: (isValid: boolean) => void;
 }
 
 const CartSummary: React.FC<CartSummaryProps> = ({
@@ -38,15 +37,9 @@ const CartSummary: React.FC<CartSummaryProps> = ({
   setSelectAll,
   selectedItems,
   setSelectedItems,
-  onValidChange,
 }) => {
   const dispatch = useDispatch();
   const { cart } = useSelector((state: RootState) => state.products);
-
-  useEffect(() => {
-    // 當selectedItems改變時，更新是否可以進行下一步的狀態
-    onValidChange(selectedItems.length > 0);
-  }, [selectedItems, onValidChange]);
 
   const buttonTextStyle = {
     minWidth: { xs: "1rem", sm: "36px" },
@@ -54,85 +47,83 @@ const CartSummary: React.FC<CartSummaryProps> = ({
   };
   const footerTextStyle = { fontSize: { xs: "0.6rem", sm: "1rem" } };
 
-  // 選擇Cart全部品項
-  const handleSelectAll = () => {
+  // 購物車全部品項
+  const cartItems = useMemo(
+    () =>
+      cart.map((item) => ({
+        id: item.id,
+        color: item.color,
+        size: item.size,
+      })),
+    [cart]
+  );
+  // 被選擇的商品
+  const isItemSelected = useMemo(
+    () => (id: string, color: string, size: string) =>
+      selectedItems.some(
+        (item) => item.id === id && item.color === color && item.size === size
+      ),
+    [selectedItems]
+  );
+
+  // 清空/全選 Cart全部品項
+  const handleSelectAll = useCallback(() => {
     if (selectAll) {
       setSelectedItems([]);
     } else {
-      setSelectedItems(
-        cart.map((item) => ({
-          id: item.id,
-          color: item.color,
-          size: item.size,
-        }))
-      );
+      setSelectedItems(cartItems);
     }
     setSelectAll(!selectAll);
-  };
+  }, [selectAll, setSelectedItems, setSelectAll, cartItems]);
 
   // 當選擇Cart內特定品項
-  const handleSelectItem = (id: string, color: string, size: string) => {
-    const isSelected = selectedItems.some(
-      (item) => item.id === id && item.color === color && item.size === size
-    );
+  const handleSelectItem = useCallback(
+    (id: string, color: string, size: string) => {
+      const isSelected = isItemSelected(id, color, size);
 
-    // 已被選擇則移除checked
-    if (isSelected) {
-      setSelectedItems(
-        selectedItems.filter(
-          (item) =>
-            !(item.id === id && item.color === color && item.size === size)
-        )
-      );
-    } else {
-      // 沒被選擇則添加checked
-      setSelectedItems([...selectedItems, { id, color, size }]);
-    }
-  };
+      // 已被選擇則移除checked
+      if (isSelected) {
+        setSelectedItems(
+          selectedItems.filter(
+            (item) =>
+              !(item.id === id && item.color === color && item.size === size)
+          )
+        );
+      } else {
+        // 沒被選擇則添加checked
+        setSelectedItems([...selectedItems, { id, color, size }]);
+      }
+    },
+    [selectedItems, setSelectedItems]
+  );
 
   // 改變商品數量
-  const handleQuantityChange = (
-    id: string,
-    color: string,
-    size: string,
-    newQuantity: number
-  ) => {
-    if (newQuantity > 0) {
-      dispatch(
-        updateCartItemQuantity({ id, color, size, quantity: newQuantity })
-      );
-    }
-  };
+  const handleQuantityChange = useCallback(
+    (id: string, color: string, size: string, newQuantity: number) => {
+      if (newQuantity > 0) {
+        dispatch(
+          updateCartItemQuantity({ id, color, size, quantity: newQuantity })
+        );
+      }
+    },
+    [dispatch]
+  );
 
   // 計算選中的商品的總金額
-  const calculateTotal = () => {
+  const calculateTotal = useMemo(() => {
     return cart
-      .filter((item) =>
-        selectedItems.some(
-          (selectedItem) =>
-            selectedItem.id === item.id &&
-            selectedItem.color === item.color &&
-            selectedItem.size === item.size
-        )
-      )
+      .filter((item) => isItemSelected(item.id, item.color, item.size))
       .reduce((total, item) => total + item.price * item.quantity, 0);
-  };
+  }, [cart, isItemSelected]);
 
   // 計算選中的商品的總數量
-  const calculateItemsCount = () => {
+  const calculateItemsCount = useMemo(() => {
     return cart
-      .filter((item) =>
-        selectedItems.some(
-          (selectedItem) =>
-            selectedItem.id === item.id &&
-            selectedItem.color === item.color &&
-            selectedItem.size === item.size
-        )
-      )
+      .filter((item) => isItemSelected(item.id, item.color, item.size))
       .reduce((count, item) => count + item.quantity, 0);
-  };
+  }, [cart, isItemSelected]);
 
-  const totalAmount = Math.floor(calculateTotal());
+  const totalAmount = Math.floor(calculateTotal);
   const shippingCost = 60;
   const discount = totalAmount > 100 ? shippingCost : 0;
   const finalTotal = totalAmount + shippingCost - discount;
@@ -327,7 +318,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
         <Grid container justifyContent="flex-end" spacing={1}>
           <Grid item xs={6}>
             <Typography variant="body1" align="right" sx={footerTextStyle}>
-              共 {calculateItemsCount()} 件商品
+              共 {calculateItemsCount} 件商品
             </Typography>
           </Grid>
 

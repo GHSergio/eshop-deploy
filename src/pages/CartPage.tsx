@@ -41,10 +41,6 @@ const CartPage: React.FC = () => {
     cvv: "",
   });
 
-  // 驗證
-  const [isCartValid, setIsCartValid] = useState(false);
-  // const [isShippingValid, setIsShippingValid] = useState(false);
-  // const [isPaymentValid, setIsPaymentValid] = useState(false);
   // 驗證狀態提升至 CartPage
   const [errors, setErrors] = useState({
     shipping: {
@@ -63,15 +59,15 @@ const CartPage: React.FC = () => {
   });
   const [submitted, setSubmitted] = useState(false);
 
-  console.log("submitted:", submitted);
-  console.log("運送資訊:", shippingInfo);
+  // console.log("submitted:", submitted);
+  // console.log("運送資訊:", shippingInfo);
   // console.log("支付方式:", paymentInfo);
 
   // 使用 useDispatch 來發送 action
   const dispatch = useDispatch();
 
   // 處理 Shipping 的表單驗證
-  const validateShippingInfo = (): boolean => {
+  const validateShippingInfo = useCallback((): boolean => {
     const newErrors = {
       fullName: shippingInfo.fullName.trim() === "",
       phone: !/^\d{10}$/.test(shippingInfo.phone),
@@ -82,10 +78,10 @@ const CartPage: React.FC = () => {
     };
     setErrors((prev) => ({ ...prev, shipping: newErrors }));
     return !Object.values(newErrors).some((error) => error);
-  };
+  }, [shippingInfo]);
 
   // 處理 Payment 的表單驗證
-  const validatePaymentInfo = (): boolean => {
+  const validatePaymentInfo = useCallback((): boolean => {
     const newErrors = {
       cardNumber: !/^\d{16}$/.test(paymentInfo.cardNumber),
       expiryDate: paymentInfo.expiryDate.trim() === "",
@@ -93,10 +89,10 @@ const CartPage: React.FC = () => {
     };
     setErrors((prev) => ({ ...prev, payment: newErrors }));
     return !Object.values(newErrors).some((error) => error);
-  };
+  }, [paymentInfo]);
 
   // 驗證表單是否填寫正確 才能進入Next Step
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     //透過 submit && error -> 顯示 textHelper
     setSubmitted(true);
 
@@ -112,7 +108,13 @@ const CartPage: React.FC = () => {
       setActiveStep((prevActiveStep) => prevActiveStep + 1);
       setSubmitted(false);
     }
-  };
+  }, [
+    activeStep,
+    shippingInfo,
+    paymentInfo,
+    validateShippingInfo,
+    validatePaymentInfo,
+  ]);
 
   // 回到上個Step
   const handleBack = () => {
@@ -129,6 +131,10 @@ const CartPage: React.FC = () => {
     setPaymentInfo(info);
   };
 
+  const handleClearCart = useCallback(() => {
+    dispatch(clearCart());
+  }, [dispatch]);
+
   const renderStepContent = (step: number) => {
     switch (step) {
       case 0:
@@ -138,15 +144,12 @@ const CartPage: React.FC = () => {
             setSelectAll={setSelectAll}
             selectedItems={selectedItems}
             setSelectedItems={setSelectedItems}
-            onValidChange={setIsCartValid}
           />
         );
       case 1:
         return (
           <ShippingInformation
             onInfoChange={handleShippingInfoChange}
-            // 立即顯示errors狀態
-            // onValidChange={setIsShippingValid}
             shippingInfo={shippingInfo}
             submitted={submitted}
             errors={errors.shipping}
@@ -159,7 +162,6 @@ const CartPage: React.FC = () => {
         return (
           <PaymentDetails
             onPaymentChange={handlePaymentInfoChange}
-            // onValidChange={setIsPaymentValid}
             paymentInfo={paymentInfo}
             submitted={submitted}
             errors={errors.payment}
@@ -183,7 +185,7 @@ const CartPage: React.FC = () => {
               to="/"
               variant="contained"
               color="primary"
-              onClick={() => dispatch(clearCart())}
+              onClick={handleClearCart}
             >
               返回主頁面
             </Button>
@@ -191,6 +193,11 @@ const CartPage: React.FC = () => {
         );
     }
   };
+
+  const stepContent = useMemo(
+    () => renderStepContent(activeStep),
+    [activeStep, selectedItems, shippingInfo, paymentInfo, errors, submitted]
+  );
 
   return (
     <Box
@@ -237,7 +244,7 @@ const CartPage: React.FC = () => {
           padding: "0.5rem",
         }}
       >
-        {renderStepContent(activeStep)}
+        {stepContent}
       </Box>
 
       {/* Button */}
@@ -255,11 +262,6 @@ const CartPage: React.FC = () => {
             onClick={handleNext}
             variant="contained"
             color="primary"
-            // disabled={
-            //   (activeStep === 0 && !isCartValid) ||
-            //   (activeStep === 1 && !isShippingValid) ||
-            //   (activeStep === 2 && !isPaymentValid)
-            // }
             disabled={activeStep === 0 && !selectedItems.length}
           >
             {activeStep === steps.length - 1 ? "下訂單" : "下一步"}
