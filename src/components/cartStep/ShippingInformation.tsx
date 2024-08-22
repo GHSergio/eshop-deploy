@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useCallback } from "react";
 import {
   Box,
   TextField,
@@ -12,7 +12,6 @@ import {
 
 interface ShippingInformationProps {
   onInfoChange: (info: any) => void;
-  // onValidChange: (isValid: boolean) => void;
   shippingInfo: {
     fullName: string;
     phone: string;
@@ -35,50 +34,47 @@ interface ShippingInformationProps {
 
 const ShippingInformation: React.FC<ShippingInformationProps> = ({
   onInfoChange,
-  // onValidChange,
   shippingInfo,
   submitted,
   errors,
   setErrors,
 }) => {
-  console.log("運送資訊errors:", errors);
-
-  // //檢驗 errors 是否都false -> 傳遞給onValidChange setState
-  // useEffect(() => {
-  //   const isValid = !Object.values(errors).some((error) => error);
-  //   onValidChange(isValid);
-  // }, [errors, onValidChange]);
+  // console.log("運送資訊errors:", errors);
 
   //處理TextField
-  const handleTextFieldChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const { name, value } = event.target;
-    const newErrors = { ...errors };
+  const handleTextFieldChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { name, value } = event.target;
+      const newErrors = { ...errors };
 
-    //表單立即驗證 -> 不符合則error : true
-    if (name === "phone" && !/^\d{10}$/.test(value)) {
-      newErrors.phone = true;
-    } else if (name === "email" && !/^\S+@\S+\.\S+$/.test(value)) {
-      newErrors.email = true;
-    } else {
-      newErrors[name as keyof typeof errors] = value.trim() === "";
-    }
+      //表單立即驗證 -> 不符合則error : true
+      if (name === "phone" && !/^\d{10}$/.test(value)) {
+        newErrors.phone = true;
+      } else if (name === "email" && !/^\S+@\S+\.\S+$/.test(value)) {
+        newErrors.email = true;
+      } else {
+        newErrors[name as keyof typeof errors] = value.trim() === "";
+      }
 
-    setErrors(newErrors);
-    onInfoChange((prevInfo: any) => ({ ...prevInfo, [name]: value }));
-  };
+      setErrors(newErrors);
+      onInfoChange((prevInfo: any) => ({ ...prevInfo, [name]: value }));
+    },
+    [errors, onInfoChange, setErrors]
+  );
 
   //處理select
-  const handleSelectChange = (event: SelectChangeEvent<string>) => {
-    const { name, value } = event.target;
-    const newErrors = { ...errors };
+  const handleSelectChange = useCallback(
+    (event: SelectChangeEvent<string>) => {
+      const { name, value } = event.target;
+      const newErrors = { ...errors };
 
-    newErrors[name as keyof typeof errors] = value.trim() === "";
+      newErrors[name as keyof typeof errors] = value.trim() === "";
 
-    setErrors(newErrors);
-    onInfoChange((prevInfo: any) => ({ ...prevInfo, [name]: value }));
-  };
+      setErrors(newErrors);
+      onInfoChange((prevInfo: any) => ({ ...prevInfo, [name]: value }));
+    },
+    [errors, onInfoChange, setErrors]
+  );
 
   return (
     <Box>

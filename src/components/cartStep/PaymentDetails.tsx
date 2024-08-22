@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useCallback } from "react";
 import { Box, TextField, Typography } from "@mui/material";
 
 interface PaymentDetailsProps {
   onPaymentChange: (info: any) => void;
-  // onValidChange: (isValid: boolean) => void;
   paymentInfo: {
     cardNumber: string;
     expiryDate: string;
@@ -20,30 +19,32 @@ interface PaymentDetailsProps {
 
 const PaymentDetails: React.FC<PaymentDetailsProps> = ({
   onPaymentChange,
-  // onValidChange,
   paymentInfo,
   submitted,
   errors,
   setErrors,
 }) => {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    const newErrors = { ...errors };
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { name, value } = e.target;
+      const newErrors = { ...errors };
 
-    //及時驗證 -> submit時會統一驗證
-    if (name === "cardNumber" && !/^\d{16}$/.test(value)) {
-      newErrors.cardNumber = true;
-    } else if (name === "expiryDate") {
-      newErrors.expiryDate = value.trim() === "";
-    } else if (name === "cvv" && !/^\d{3}$/.test(value)) {
-      newErrors.cvv = true;
-    } else {
-      newErrors[name as keyof typeof errors] = value.trim() === "";
-    }
+      //及時驗證 -> submit時會統一驗證
+      if (name === "cardNumber" && !/^\d{16}$/.test(value)) {
+        newErrors.cardNumber = true;
+      } else if (name === "expiryDate") {
+        newErrors.expiryDate = value.trim() === "";
+      } else if (name === "cvv" && !/^\d{3}$/.test(value)) {
+        newErrors.cvv = true;
+      } else {
+        newErrors[name as keyof typeof errors] = value.trim() === "";
+      }
 
-    setErrors(newErrors);
-    onPaymentChange((prevInfo: any) => ({ ...prevInfo, [name]: value }));
-  };
+      setErrors(newErrors);
+      onPaymentChange((prevInfo: any) => ({ ...prevInfo, [name]: value }));
+    },
+    [errors, onPaymentChange, setErrors]
+  );
 
   return (
     <Box>

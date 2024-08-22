@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Box, Typography, Divider, Card, CardMedia, Grid } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/index";
@@ -14,12 +14,12 @@ const ReviewOrder: React.FC<ReviewOrderProps> = ({
 }) => {
   const { cart } = useSelector((state: RootState) => state.products);
 
-  const calculateTotal = () => {
+  const totalAmount = useMemo(() => {
     return cart.reduce(
       (total, item) => total + Math.floor(item.price * item.quantity),
       0
     );
-  };
+  }, [cart]);
 
   const MainTextStyle = {
     fontWeight: "bold",
@@ -157,7 +157,7 @@ const ReviewOrder: React.FC<ReviewOrderProps> = ({
 
       <Box sx={{ marginTop: "2rem", textAlign: "right" }}>
         <Typography variant="h5" gutterBottom>
-          總計: ${calculateTotal()}
+          總計: ${totalAmount}{" "}
         </Typography>
       </Box>
     </Box>
