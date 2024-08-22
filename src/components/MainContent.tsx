@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { Grid, Typography, Box } from "@mui/material";
 import SearchBar from "./SearchBar";
 import ProductCard from "./ProductCard";
@@ -9,6 +9,26 @@ import {
   setSearchQuery,
   fetchProductsAndCategories,
 } from "../slice/productSlice";
+import { createSelector } from "reselect";
+
+// 使用 reselect 創建記憶化選擇器，優化性能。
+// 這個選擇器會記住上次的計算結果，除非依賴的state改變，否則不會重新計算。
+const selectFilteredProducts = createSelector(
+  (state: RootState) => state.products.products, // 提取 products 狀態
+  (state: RootState) => state.products.searchQuery, // 提取 searchQuery 狀態
+  (_: RootState, category?: string) => category, // 接受額外的參數 category
+  (products, searchQuery, category) => {
+    // 基於提取的狀態和參數進行計算
+    return products.filter((product) => {
+      const matchesCategory =
+        !category || product.category.toLowerCase() === category.toLowerCase();
+      const matchesSearch =
+        searchQuery === "" ||
+        product.title.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  }
+);
 
 interface MainContentProps {
   category?: string;
@@ -18,29 +38,42 @@ const MainContent: React.FC<MainContentProps> = ({ category }) => {
   // 明確指定 dispatch 的類型
   const dispatch: AppDispatch = useDispatch();
   // useSelector 用來從 Redux store 中提取狀態
-  const { products, searchQuery, loading, error } = useSelector(
-    (state: RootState) => state.products
-  );
+  const { loading, error } = useSelector((state: RootState) => state.products);
 
-  // 當組件掛載時，調用 fetchProductsAndCategories Thunk 獲取商品和分類數據
-  useEffect(() => {
+  // useCallback 優化的回調函數來避免不必要的重渲染。
+  // 只有當 `dispatch` 改變時，這些回調函數才會重新創建。
+  const fetchProducts = useCallback(() => {
     dispatch(fetchProductsAndCategories());
   }, [dispatch]);
 
-  // 當 category 改變時，清空搜尋字串
-  useEffect(() => {
+  const clearSearchQuery = useCallback(() => {
     dispatch(setSearchQuery(""));
-  }, [category, dispatch]);
+  }, [dispatch]);
 
-  // 根據 category 和 searchQuery 進行過濾
-  const filteredProducts = products.filter((product) => {
-    const matchesCategory =
-      !category || product.category.toLowerCase() === category.toLowerCase();
-    const matchesSearch =
-      searchQuery === "" ||
-      product.title.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  // 當組件掛載時執行 API 請求，並且在 category 改變時重置搜尋字串。
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  useEffect(() => {
+    clearSearchQuery();
+  }, [category, clearSearchQuery]);
+
+  // 使用 reselect 選擇器從 Redux store 中選取需要的狀態。
+  // 避免每次重渲染都重新計算過濾結果，提升性能。
+  const filteredProducts = useSelector((state: RootState) =>
+    selectFilteredProducts(state, category)
+  );
+
+  // // 根據 category 和 searchQuery 進行過濾
+  // const filteredProducts = products.filter((product) => {
+  //   const matchesCategory =
+  //     !category || product.category.toLowerCase() === category.toLowerCase();
+  //   const matchesSearch =
+  //     searchQuery === "" ||
+  //     product.title.toLowerCase().includes(searchQuery.toLowerCase());
+  //   return matchesCategory && matchesSearch;
+  // });
 
   if (loading) {
     return <div>Loading...</div>;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import {
   Box,
   Button,
@@ -43,8 +43,8 @@ const CartPage: React.FC = () => {
 
   // 驗證
   const [isCartValid, setIsCartValid] = useState(false);
-  const [isShippingValid, setIsShippingValid] = useState(false);
-  const [isPaymentValid, setIsPaymentValid] = useState(false);
+  // const [isShippingValid, setIsShippingValid] = useState(false);
+  // const [isPaymentValid, setIsPaymentValid] = useState(false);
   // 驗證狀態提升至 CartPage
   const [errors, setErrors] = useState({
     shipping: {
