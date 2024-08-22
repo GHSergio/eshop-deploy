@@ -30,10 +30,11 @@
 
 ## 技術棧
 
-- 前端框架: React
-- UI 框架: Material-UI
-- 狀態管理: React Context API & Redux Toolkit
-- 路由: React Router
+- 使用 React 和 TypeScript 開發前端應用，確保代碼的穩定性和可維護性。
+- 使用 MUI（Material-UI）構建響應式和現代化的 UI，確保介面的美觀與一致性。
+- 使用 React Router 管理應用的路由和導航。
+- 透過 Redux Toolkit 管理全局狀態，優化購物車和產品數據的處理，
+- 採用 useMemo、useCallback 和 reselect 等技術進行性能優化，提升用戶體驗，實現了防抖搜尋功能，減少不必要的 API 請求。
 
 ## Author
 
